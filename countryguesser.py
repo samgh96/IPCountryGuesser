@@ -9,7 +9,9 @@ ipFile = sys.argv[1]
 ipDict = []
 
 def fileParser():
-    
+    with open(ipFile) as ipF:
+        r = ipF.read()
+        return r.splitlines()
 
 ## OUT: Lista de diccionarios de entries ['ipStart', 'ipEnd', 'countryAcronym', 'countryName']
 def csvToDict():
@@ -36,12 +38,11 @@ def ipToDecimal(base256IP):
 
 def isIPinRange(decimalIP, dictEntry):
     return (decimalIP >= dictEntry['ipStart']) and (decimalIP <= dictEntry['ipEnd']) 
-
-def guessCountry(decimalIP, dictEntry):
-    if isIPinRange(decimalIP, dictEntry):
-        print("The IP {} corresponds to {} ({})".format(sys.argv[1], dictEntry['countryName'], dictEntry['countryAcronym']))
+    
 
 csvToDict()
 
-for d in ipDict:
-    guessCountry(ipToDecimal(sys.argv[1]), d)
+for i in fileParser():
+    for d in ipDict:
+        if isIPinRange(ipToDecimal(i), d):
+            print("The IP {} corresponds to {} ({})".format(i, d['countryName'], d['countryAcronym']))

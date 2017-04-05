@@ -4,6 +4,7 @@
 
 import csv
 import sys
+import socket
 
 ipFile = sys.argv[1]
 ipDict = []
@@ -13,6 +14,8 @@ def fileParser():
     with open(ipFile) as ipF:
         r = ipF.read()
         return r.splitlines()
+
+
 
 
 # OUT: Lista de diccionarios de entries ['ipStart', 'ipEnd', 'countryAcronym', 'countryName']
@@ -44,7 +47,18 @@ def isIPinRange(decimalIP, dictEntry):
 
 csvToDict()
 
-for i in fileParser():
-    for d in ipDict:
-        if isIPinRange(ipToDecimal(i), d):
-            print("The IP {} corresponds to {} ({})".format(i, d['countryName'], d['countryAcronym']))
+def findEntry(decimalIP):
+    return filter(lambda isIPinRange: (decimalIP >= isIPinRange['ipStart']) and (decimalIP <= isIPinRange['ipEnd']), ipDict)
+
+
+def countryGuesser():
+    for i in fileParser():
+        try:
+            socket.inet_aton(i)
+        except socket.error:
+                print("[ERR] The IP {} is not valid!!!".format(i))
+        entry = list(findEntry(ipToDecimal(i)))
+        print("The IP {} corresponds to {} ({})".format(i, entry[0]['countryName'], entry[0]['countryAcronym']))
+
+                
+countryGuesser()
